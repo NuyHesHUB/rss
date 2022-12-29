@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신문사 연동하기</title>
+    <style>
+        .chosunNews{width: 800px; height: auto; padding: 10px 20px; border: 5px solid #ddd; margin: 50px auto; position: relative;}
+        .chosunNews::before{content: "조선 스포츠"; width: 100px; height: 30px; background: #000; color: #222; position: absolute; top: -35px; left: 10px; text-align: center; padding-top: 5px; color: #fff; font-weight: bold; border-radius: 10px;}
+        ul{list-style: none;}
+        li{line-height: 180%; border-bottom: 1px solid #ccc;}
+    </style>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.js' integrity='sha512-nO7wgHUoWPYGCNriyGzcFwPSF+bPDOR+NvtOYy2wMcWkrnCNPKBcFEkU80XIN14UVja0Gdnff9EmydyLlOL7mQ==' crossorigin='anonymous'></script>
+    <script>
+        $(function(){
+            $.ajax({
+                /* url:"https://www.chosun.com/arc/outboundfeeds/rss/category/sports/?outputType=xml", */ //안돼서 php를 불러준다.
+                url:"news.php",
+                dataType:"xml",
+                success:function(data){
+                    //console.log(data)//하면 브라우저 콘솔창에 에러가 뜬다. 교차 도메인을 허용하지 않음. 그럼 php로 허용하는 방법으로 해서 한다?
+                    let $items=$(data).find('item')
+                    if($items.length > 0){
+                        $items=$items.slice(0, 10);
+                        let $ulTag=$('<ul />');
+                        $.each($items, function(i, o){ //i= index를 의미 o=item을 의미?
+                            let $title=$(o).find('title').text();
+                            let $link=$(o).find('link').text();
+                            let $description=$(o).find('description').text();
+
+                            let $aTag=$('<a />').attr({"href": $link, "target":"_blank"}).text($title);
+                            let $liTag=$('<li />').append($aTag);
+
+                            $ulTag.append($liTag);
+                        })
+
+                        $('.chosunNews').append($ulTag); //여기 안에다가 ul태그를 넣어
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="chosunNews"></div>
+</body>
+</html>
